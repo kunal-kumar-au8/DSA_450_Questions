@@ -1,0 +1,42 @@
+BlocConsumer<CommunicationBloc, CommunicationState>(listener: (context, state) {
+                    if (state is ChatInitiatedState) {
+                      Get.toNamed(AppRouter.chatPageRoute, arguments: ChatPageArgument(chat: state.chat, route: AppRouter.selectYourBusinessPageRoute));
+                    }
+                  }, builder: (context, state) {
+                    return Center(
+                        child: TextButton(
+                      child: Text(
+                        state is InitiatingChatState ? 'Loading ...' :Strings.reportGst,
+                        style: const TextStyle(decoration: TextDecoration.underline),
+                      ),
+                      onPressed: state is InitiatingChatState
+                          ? null
+                          : () {
+                              Helper.trackButtonClick(name: Strings.reportGst);
+                              BlocProvider.of<CommunicationBloc>(context).add(InitiateChatEvent());
+                            },
+                    ));
+                  }),
+                  // Expanded(child: Container()),
+
+                  if (state is GettingAuthTokenState)
+                    const LinearProgressIndicator()
+                  else
+                    Row(children: [
+                      Expanded(
+                          child: ElevatedButton(
+                              child: const Text(
+                                Strings.continueText,
+                                textAlign: TextAlign.center,
+                              ),
+                              onPressed: _selectedBusiness != ''
+                                  ? () {
+                                      Helper.trackButtonClick(name: Strings.continueText);
+                                      if (_selectedBusiness == Keys.enterGst) {
+                                        Get.toNamed(AppRouter.enterGstinPageRoute);
+                                      } else {
+                                        BlocProvider.of<AuthBloc>(context).add(GetAuthTokenEvent(gstin: _selectedBusiness));
+                                      }
+                                    }
+                                  : null))
+                    ]),
